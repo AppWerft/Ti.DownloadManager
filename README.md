@@ -19,7 +19,8 @@ dmg.startDownload({
     title: "Download",
     description: "Download " + filename
 });
-
+dmg.disableNotification();
+dmg.setEventName("Name_des_Ready_Events");
 dmg.getAllDownloads();
 dmg.getPendingDownloads();
 dmg.getFailedDownloads();
@@ -33,3 +34,17 @@ function onDone(){
 	alert("done");
 }
 ~~~
+
+## Notification
+
+A notification will shown. In case of supressing this entry must be in manifest:
+
+```xml
+<uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+``` 
+
+```js
+dmg.disableNotification();
+dmg.enableNotification();
+
+```

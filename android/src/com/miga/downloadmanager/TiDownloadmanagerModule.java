@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import org.appcelerator.kroll.annotations.Kroll;
 
 import org.appcelerator.titanium.TiApplication;
+import org.appcelerator.titanium.TiC;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiConfig;
 import org.appcelerator.kroll.KrollDict;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import android.content.Intent;
 import android.database.Cursor;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 @Kroll.module(name = "TiDownloadmanager", id = "com.miga.downloadmanager")
@@ -111,10 +114,13 @@ public class TiDownloadmanagerModule extends KrollModule {
 	public static final String ALLOWED_NETWORK_TYPES = "allowedNetworkTypes";
 
 	private TiApplication appContext = TiApplication.getInstance();
+	private static TiApplication tiapp;
 	private Activity activity = appContext.getCurrentActivity();
 
 	private DownloadManager dMgr;
 	private KrollFunction callback;
+	private String eventName = "DownloadReady";
+	private boolean notificationvisible = true;
 	private int allowedNetworkTypes = ConnectivityManager.TYPE_MOBILE | ConnectivityManager.TYPE_WIFI
 			| ConnectivityManager.TYPE_VPN;
 
@@ -128,15 +134,42 @@ public class TiDownloadmanagerModule extends KrollModule {
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
+		tiapp=app;
 	}
 
 	// Methods
 	@Kroll.method
-	public void startDownload(KrollDict dict) {
-		callback = (KrollFunction) dict.get("success");
-		_startDownload(dict);
+	
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
 	}
-
+	@Kroll.method
+	public void startDownload(KrollDict dict) {
+		if (dict.containsKeyAndNotNull("success")) {
+			Object o = dict.get("success");
+			if (o instanceof KrollFunction) {
+				callback = (KrollFunction) dict.get("success");
+				Log.d(LCAT,"success callback successfull registered");
+			} else Log.w(LCAT,"success isn't a callback");
+		} else  Log.w(LCAT,"missing success property");
+		if (dict.containsKeyAndNotNull(TiC.PROPERTY_URL)) {
+			try {
+			    new URI(dict.getString(TiC.PROPERTY_URL));
+			    _startDownload(dict);
+			} catch (URISyntaxException e) {
+				Log.e(LCAT, "url is not valid");
+			}
+		}
+		
+	}
+	@Kroll.method
+	public void enableNotification() {
+		this.notificationvisible = true;
+	}
+	@Kroll.method
+	public void disableNotification() {
+		this.notificationvisible = true;
+	}
 	@Kroll.method
 	public void setAllowedNetworkTypes(int allowedNetworkTypes) {
 		this.allowedNetworkTypes = allowedNetworkTypes;
@@ -222,22 +255,18 @@ public class TiDownloadmanagerModule extends KrollModule {
 			dMgr = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
 			return downList.toArray();
 		}
-
 		Cursor c = dMgr.query(query);
 		c.moveToFirst();
 		while (c.moveToNext()) {
 			HashMap<String, Object> dl = new HashMap<String, Object>();
-
 			String filename = null;
 			String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 			if (downloadFileLocalUri != null) {
 				File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
 				filename = mFile.getAbsolutePath();
 			}
-
 			int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
 			int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-
 			dl.put("status", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
 			dl.put("filename", filename);
 			dl.put("size_total", bytes_total);
@@ -258,11 +287,11 @@ public class TiDownloadmanagerModule extends KrollModule {
 	}
 
 	public void done() {
+		KrollDict event = new KrollDict();
 		if (callback != null) {
-			HashMap<String, String> event = new HashMap<String, String>();
-			// event.put("something","something");
 			callback.call(getKrollObject(), event);
 		}
+		tiapp.fireAppEvent(eventName,event );
 	}
 
 	public void cancel() {
@@ -276,10 +305,16 @@ public class TiDownloadmanagerModule extends KrollModule {
 	}
 
 	private void _startDownload(KrollDict dict) {
-		DownloadManager.Request dmReq = new DownloadManager.Request(Uri.parse(TiConvert.toString(dict, "url")));
+		Log.d(LCAT,"_startDownload, notificationvisible: " +notificationvisible);
+		DownloadManager.Request dmReq = new DownloadManager.Request(Uri.parse(dict.getString(TiC.PROPERTY_URL)));
 		dmReq.setTitle(TiConvert.toString(dict, "title"));
 		dmReq.setDescription(TiConvert.toString(dict, "description"));
-
+		if (dict.containsKeyAndNotNull("notificationvisible"))
+			notificationvisible = dict.getBoolean("notificationvisible");
+		//https://stackoverflow.com/questions/9345977/downloadmanager-request-setnotificationvisibility-fails-with-jsecurityexception
+		dmReq.setNotificationVisibility(notificationvisible
+				? DownloadManager.Request.VISIBILITY_VISIBLE
+						:DownloadManager.Request.VISIBILITY_HIDDEN);
 		if (dict.containsKeyAndNotNull(ALLOWED_NETWORK_TYPES)) {
 			dmReq.setAllowedNetworkTypes(dict.getInt(ALLOWED_NETWORK_TYPES));
 		} else {
