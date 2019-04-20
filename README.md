@@ -57,16 +57,15 @@ dmg.remove([id1,id2,id3 … ]);
 A request without parameters works with defaults properties. You can modify by some methods:
 
 ```js
-const req = dmg.createRequest('https://avatars0.githubusercontent.com/u/2996237?s=460&v=4');
-
-dmg.enqueue(req
-	.setNotificationVisibility(dmg.)
+const request = dmg.createRequest('https://avatars0.githubusercontent.com/u/2996237?s=460&v=4');
+dmg.enqueue(request
+	.setNotificationVisibility(dmg.VISIBILITY_VISIBLE )
 	.setTitle("mytitle")
 	.setDescription("longer Text"););
 ```
  
 
-# Methods
+# Methods of Request
 ## setNotificationVisibility()
 
 This method is to control whether a system notification is shown while this download is running or when it is completed.
