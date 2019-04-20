@@ -172,10 +172,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		this.allowedNetworkTypes = allowedNetworkTypes;
 	}
 
-	@Kroll.method
-	public void remove(String id) {
-		_remove(id);
-	}
+	
 
 	@Kroll.method
 	public Long getMaxBytesOverMobile() {
