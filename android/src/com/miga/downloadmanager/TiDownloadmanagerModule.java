@@ -28,6 +28,8 @@ import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import org.appcelerator.kroll.KrollFunction;
 import java.util.HashMap;
+import java.util.List;
+
 import android.content.Intent;
 import android.database.Cursor;
 import java.io.File;
@@ -120,7 +122,9 @@ public class TiDownloadmanagerModule extends KrollModule {
 	private DownloadManager dMgr;
 	private KrollFunction callback;
 	private String eventName = "DownloadReady";
-	private boolean notificationvisible = true;
+	private int notificationvisibility = 0;
+	
+	
 	private int allowedNetworkTypes = ConnectivityManager.TYPE_MOBILE | ConnectivityManager.TYPE_WIFI
 			| ConnectivityManager.TYPE_VPN;
 
@@ -137,14 +141,13 @@ public class TiDownloadmanagerModule extends KrollModule {
 		tiapp=app;
 	}
 
-	// Methods
-	@Kroll.method
 	
+	@Kroll.method
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
 	}
 	@Kroll.method
-	public void startDownload(KrollDict dict) {
+	public Long startDownload(KrollDict dict) {
 		if (dict.containsKeyAndNotNull("success")) {
 			Object o = dict.get("success");
 			if (o instanceof KrollFunction) {
@@ -155,21 +158,15 @@ public class TiDownloadmanagerModule extends KrollModule {
 		if (dict.containsKeyAndNotNull(TiC.PROPERTY_URL)) {
 			try {
 			    new URI(dict.getString(TiC.PROPERTY_URL));
-			    _startDownload(dict);
+			    return _startDownload(dict);
 			} catch (URISyntaxException e) {
 				Log.e(LCAT, "url is not valid");
+				return new Long(0);
 			}
 		}
-		
+		return new Long(0);
 	}
-	@Kroll.method
-	public void enableNotification() {
-		this.notificationvisible = true;
-	}
-	@Kroll.method
-	public void disableNotification() {
-		this.notificationvisible = true;
-	}
+	
 	@Kroll.method
 	public void setAllowedNetworkTypes(int allowedNetworkTypes) {
 		this.allowedNetworkTypes = allowedNetworkTypes;
@@ -181,13 +178,13 @@ public class TiDownloadmanagerModule extends KrollModule {
 	}
 
 	@Kroll.method
-	public String getMaxBytesOverMobile() {
-		return "" + DownloadManager.getMaxBytesOverMobile(appContext);
+	public Long getMaxBytesOverMobile() {
+		return  DownloadManager.getMaxBytesOverMobile(appContext);
 	}
 
 	@Kroll.method
-	public String getRecommendedMaxBytesOverMobile() {
-		return "" + DownloadManager.getRecommendedMaxBytesOverMobile(appContext);
+	public Long getRecommendedMaxBytesOverMobile() {
+		return DownloadManager.getRecommendedMaxBytesOverMobile(appContext);
 	}
 
 	@Kroll.method
@@ -300,21 +297,51 @@ public class TiDownloadmanagerModule extends KrollModule {
 		appContext.startActivity(pageView);
 	}
 
-	private void _remove(String id) {
+	
 
+	
+	@Kroll.method
+	public Long enqueue(RequestProxy proxy) {
+		return dMgr.enqueue(proxy.request);
 	}
+	
+	/* Titaniums Javascript uses an array og long */
+	/* API aspects Long... */
+	@Kroll.method
+	public int remove(Object o) {
+		/* Titanium give us one long id: */
+		if (o instanceof Long) {
+			return dMgr.remove((Long) o);
+		}
+		/* Titanium uses an array of numbers: */
+		if (o instanceof Object[]) {
+			List<Long> list = new ArrayList<Long>();
+			for (Object e : (Object[])o) {
+				if (e instanceof Long) {
+					list.add((Long)e);
+				}	
+			}
+			long[] primitives = new long[list.size()];
+		    for (int i = 0; i < list.size(); i++)
+		         primitives[i] = list.get(i);
+			dMgr.remove(primitives);	
+		}
+		return 0;
+		
+	}
+	
 
-	private void _startDownload(KrollDict dict) {
-		Log.d(LCAT,"_startDownload, notificationvisible: " +notificationvisible);
+
+	
+	private Long _startDownload(KrollDict dict) {
+		
 		DownloadManager.Request dmReq = new DownloadManager.Request(Uri.parse(dict.getString(TiC.PROPERTY_URL)));
 		dmReq.setTitle(TiConvert.toString(dict, "title"));
 		dmReq.setDescription(TiConvert.toString(dict, "description"));
 		if (dict.containsKeyAndNotNull("notificationvisible"))
-			notificationvisible = dict.getBoolean("notificationvisible");
+			
 		//https://stackoverflow.com/questions/9345977/downloadmanager-request-setnotificationvisibility-fails-with-jsecurityexception
-		dmReq.setNotificationVisibility(notificationvisible
-				? DownloadManager.Request.VISIBILITY_VISIBLE
-						:DownloadManager.Request.VISIBILITY_HIDDEN);
+		
 		if (dict.containsKeyAndNotNull(ALLOWED_NETWORK_TYPES)) {
 			dmReq.setAllowedNetworkTypes(dict.getInt(ALLOWED_NETWORK_TYPES));
 		} else {
@@ -330,7 +357,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		TiBaseFile file = TiFileFactory.createTitaniumFile(new String[] { TiConvert.toString(dict, "filename") },
 				false);
 		dmReq.setDestinationUri(Uri.fromFile(file.getNativeFile()));
-		dMgr.enqueue(dmReq);
+		return dMgr.enqueue(dmReq);
 	}
 
 }
