@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.AudioNotification/android/lib/okhttp-3.9.0.jar"/>
 	<classpathentry kind="lib" path="/Users/fuerst/Library/Android/sdk/extras/android/m2repository/com/android/support/support-v4/26.0.0-alpha1/support-v4-26.0.0-alpha1-sources.jar"/>
 	<classpathentry kind="lib" path="/Users/fuerst/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar"/>
+	<classpathentry kind="lib" path="/Users/fuerst/Library/Application Support/Titanium/mobilesdk/osx/8.0.0.GA/android/modules/titanium-filesystem.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

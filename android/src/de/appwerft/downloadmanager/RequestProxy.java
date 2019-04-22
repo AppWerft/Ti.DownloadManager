@@ -8,14 +8,20 @@
  */
 package de.appwerft.downloadmanager;
 
+import ti.modules.titanium.filesystem.FileProxy;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiConfig;
+import org.appcelerator.titanium.TiC;
+import org.appcelerator.titanium.io.TiBaseFile;
+import org.appcelerator.titanium.io.TiFile;
+import org.appcelerator.titanium.io.TiFileFactory;
 
 import android.app.DownloadManager;
 import android.net.Uri;
@@ -91,6 +97,39 @@ public class RequestProxy extends KrollProxy {
 	public RequestProxy setDescription(String descr) {
 		request.setDescription(descr);
 		return this;
+	}
+
+	@Kroll.method
+	public RequestProxy setDestinationUri(Object readPath) {
+		/* this is the example pattern for importing files in Titanium: 
+		 * reads all kinds of files
+		 * */
+		try {
+			TiBaseFile inputFile = null;
+			if (readPath instanceof TiFile) {  
+				inputFile = TiFileFactory.createTitaniumFile(((TiFile) readPath).getFile().getAbsolutePath(), false);
+			} else {
+				if (readPath instanceof FileProxy) {
+					inputFile = ((FileProxy) readPath).getBaseFile();
+				} else {
+					if (readPath instanceof TiBaseFile) {
+						inputFile = (TiBaseFile) readPath;
+					} else {
+						// Assume path provided
+						inputFile = TiFileFactory.createTitaniumFile(readPath.toString(), false);
+					}
+				}
+			}
+			request.setDestinationUri(Uri.fromFile(inputFile.getNativeFile()));
+			return this;
+
+		} catch (Exception e) {
+			HashMap<String, Object> errEvent = new HashMap<String, Object>();
+			errEvent.put(TiC.PROPERTY_SUCCESS, false);
+			errEvent.put("message", e.getMessage());
+			return this;
+		}
+
 	}
 
 	@Kroll.method

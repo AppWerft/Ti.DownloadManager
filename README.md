@@ -1,8 +1,10 @@
-# Android DownloadManager support for Titanum 
+# Android DownloadManager
+
+This is the Axway Titanium Downloadmanager. 
 
 <img src="dmgr.gif" width=220 />
 
-Use the Android default DownloadManager to download files in the background. It will open the system download list when you click on the notification.
+The download manager is a system service that handles long-running HTTP downloads. Clients may request that a URI be downloaded to a particular destination file. The download manager will conduct the download in the background, taking care of HTTP interactions and retrying downloads after failures or across connectivity changes and system reboots. 
 
 ~~~javascript
 var dmg = require("de.appwerft.downloadmanager");
@@ -97,8 +99,18 @@ const request = dmg.createRequest("https://www.google.com/url?sa=i&rct=j&q=&esrc
 request.setNotificationVisibility(dmg.VISIBILITY_VISIBLE);
 // or
 dmg.notificationvisibility = dmg.VISIBILITY_VISIBLE);
-
 ```
+
+### setDestinationUri(String|File)
+
+This method sets the destination path. As parameter you can use a TiFile (see example). 
+
+```javascript
+const filename = url.substring(url.lastIndexOf('/') + 1);
+const tifile = Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, filename);
+request.setDestinationUri(tifile);
+```
+
 ### addRequestHeader(key, value)
 
 Add an HTTP header to be included with the download request. The header will be added to the end of the list.
@@ -111,6 +123,7 @@ request.addRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
 Restrict the types of networks over which this download may proceed. By default, all network types are allowed. Consider using `setAllowedOverMetered(boolean)` instead, since it's more flexible.
 
 As of Build.VERSION\_CODES.N, setting only the NETWORK_WIFI flag here is equivalent to calling setAllowedOverMetered(boolean) with false.
+
 
 ```javascript
 request.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WIFI);
