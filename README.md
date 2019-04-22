@@ -19,9 +19,11 @@ dmg.createRequest(URL);
  
 request
 	.setAllowedNetworks(Ti.Network.NETWORK_WIFI)
+	.setTitle("netter Titel")
+	.setdescription("nette Beschreibung")
 	.setDestinationUri(localfile);
 	// some other build methods
-dmg	.enqueue(request);
+	.enqueue();
 ```
 You can always read the state:
 
@@ -187,8 +189,14 @@ request.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WI
 ### setAllowedOverMetered(boolean)
 Set whether this download may proceed over a metered network connection. By default, metered networks are allowed.
 
+### setNotificationVisibility(int)
 
-
+#####  	VISIBILITY\_VISIBLE
+This download is visible but only shows in the notifications while it's in progress. 
+#####   VISIBILITY\_HIDDEN
+This download doesn't show in the UI or in the notifications. 
+#####   VISIBILITY\_VISIBLE\_NOTIFY\_COMPLETED
+This download is visible and shows in the notifications while in progress and after completion. 
 
 ### setAllowedOverRoaming(boolean) 
 Set whether this download may proceed over a roaming connection. By default, roaming is allowed.
