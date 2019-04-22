@@ -143,6 +143,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 
 	
 	@Kroll.method
+	@Kroll.setProperty
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
 	}
@@ -280,14 +281,22 @@ public class TiDownloadmanagerModule extends KrollModule {
 		return downList.toArray();
 	}
 
-	public void done() {
+	public void done(Long id) {
+		KrollDict event = new KrollDict();
+		event.put("id" ,id);
+		if (callback != null) {
+			callback.call(getKrollObject(), event);
+		}
+		tiapp.fireAppEvent("DownloadDone",event );
+	}
+
+	public void complete() {
 		KrollDict event = new KrollDict();
 		if (callback != null) {
 			callback.call(getKrollObject(), event);
 		}
-		tiapp.fireAppEvent(eventName,event );
+		tiapp.fireAppEvent("DownloadComplete",event );
 	}
-
 	public void cancel() {
 		Intent pageView = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
 		pageView.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
