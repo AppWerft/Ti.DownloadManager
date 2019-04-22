@@ -123,3 +123,5 @@ request.Description("Mein lustiger Titel");
 ```
 ### setMimetype()
 Sets the mime type in internal database.
+
+### allowScanningByMediaScanner
