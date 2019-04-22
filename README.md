@@ -134,4 +134,4 @@ If the file to be downloaded is to be scanned by MediaScanner, this method shoul
 
 ### enqueue()
 
-The standard way is to use `dmg.enqueue(request);`; you can call `request.enqueue()` too.
+The standard way is to use `dmg.enqueue(request);`; you can call `request.enqueue()` too. It returns the `id`.

@@ -48,8 +48,8 @@ public class RequestProxy extends KrollProxy {
 	}
 
 	@Kroll.method
-	public void enqueue() {
-		TiDownloadmanagerModule.dMgr.enqueue(request);
+	public Long  enqueue() {
+		return TiDownloadmanagerModule.dMgr.enqueue(request);
 	}
 
 	@Kroll.method
