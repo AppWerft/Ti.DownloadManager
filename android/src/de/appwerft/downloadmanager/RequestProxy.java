@@ -35,7 +35,6 @@ public class RequestProxy extends KrollProxy {
 	private static final boolean DBG = TiConfig.LOGD;
 	public DownloadManager.Request request;
 
-	// Constructor
 	public RequestProxy() {
 		super();
 	}
