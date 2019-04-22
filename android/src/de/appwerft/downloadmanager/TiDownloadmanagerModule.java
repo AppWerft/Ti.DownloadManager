@@ -37,7 +37,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 
-@Kroll.module(name = "TiDownloadmanager", id = "de.appwerft.downloadmanager")
+@Kroll.module(name = "TiDownloadmanager", id = "de.appwerft.downloadmanager",propertyAccessors = { "onDone","onComplete" })
 public class TiDownloadmanagerModule extends KrollModule {
 
 	// Standard Debugging variables
