@@ -6,40 +6,74 @@ This is the Axway Titanium Downloadmanager.
 
 The download manager is a system service that handles long-running HTTP downloads. Clients may request that a URI be downloaded to a particular destination file. The download manager will conduct the download in the background, taking care of HTTP interactions and retrying downloads after failures or across connectivity changes and system reboots. 
 
-~~~javascript
-var dmg = require("de.appwerft.downloadmanager");
+This module extends the module from [m1ga](Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, filename)) Thanks for this awesome work!
 
-var filename = url.substring(url.lastIndexOf('/') + 1);
-var file = Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, filename).nativePath;
+Here a short example:
 
-dmg.setAllowedNetworks(Ti.Network.NETWORK_WIFI)
+```javascript
+const dmg = require("de.appwerft.downloadmanager");
+const URL = "https://avatars0.githubusercontent.com/u/2996237?s=460&v=4";
+const localfile = Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, URL.substring(url.lastIndexOf('/') + 1);
 
-dmg.startDownload({
-    url: url,
-    filename: file,
-    success: onDone,
-    title: "Download",
-    description: "Download " + filename
-});
-dmg.disableNotification();
-dmg.setEventName("Name_des_Ready_Events");
+dmg.createRequest(URL);
+ 
+request
+	.setAllowedNetworks(Ti.Network.NETWORK_WIFI)
+	.setDestinationUri(localfile);
+	// some other build methods
+dmg	.enqueue(request);
+```
+You can always read the state:
+
+```javascript
 dmg.getAllDownloads();
 dmg.getPendingDownloads();
 dmg.getFailedDownloads();
 dmg.getPausedDownloads();
 dmg.getRunningDownloads();
 dmg.getSuccessfulDownloads();
-dmg.getStatusOfDownload(url);
+```
+### Events
+
+For proceeding og callbacks you have two ways: app event listeners and hooks of module.
+
+#### onDone 
+This event will trigger by download of a single file:
+
+```js
+Ti.App.addEventListener('downloadmananger.ondone',function(e) {
+	console.log(e.id);
+});
+```
+Or:
+
+```javascript
+dmg.onDone = function(e) {
+	console.log(e.id);
+});
+
+```
+#### onComplete
+This event will trigger by download of a single file:
+
+```js
+Ti.App.addEventListener('downloadmananger.oncomplete',function(e) {
+	console.log(e);
+});
+```
+Or:
+
+```javascript
+dmg.onComplete = function(e) {
+	console.log(e);
+});
+
+```
 
 
-function onDone(){
-	alert("done");
-}
-~~~
+## Methods
 
-# New interface
-
-New new interface followes mosly the pattern of native class [DownloadMananger](https://developer.android.com/reference/android/app/DownloadManager). The old interface is still working too.
+The interface followes mosly the pattern of native class [DownloadMananger](https://developer.android.com/reference/android/app/DownloadManager). The old interface is still working too.
 
 Every download creates a new download object and returns an id for subsequent operations:
 
@@ -133,8 +167,6 @@ request.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WI
 Set whether this download may proceed over a metered network connection. By default, metered networks are allowed.
 
 
-### setAllowedOverMetered(boolean)
-Set whether this download may proceed over a metered network connection. By default, metered networks are allowed.
 
 
 ### setAllowedOverRoaming(boolean) 

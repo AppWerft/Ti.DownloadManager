@@ -287,7 +287,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		if (callback != null) {
 			callback.call(getKrollObject(), event);
 		}
-		tiapp.fireAppEvent("DownloadDone",event );
+		tiapp.fireAppEvent("downloadmanager.done",event );
 	}
 
 	public void complete() {
@@ -295,7 +295,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		if (callback != null) {
 			callback.call(getKrollObject(), event);
 		}
-		tiapp.fireAppEvent("DownloadComplete",event );
+		tiapp.fireAppEvent("downloadmanager..complete",event );
 	}
 	public void cancel() {
 		Intent pageView = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
