@@ -87,4 +87,11 @@ public class RequestProxy extends KrollProxy {
 		request.setTitle(t);
 		return this;
 	}
+	
+	@Kroll.method
+	public RequestProxy allowScanningByMediaScanner() {
+		request.allowScanningByMediaScanner();
+		return this;
+	}
+	
 }

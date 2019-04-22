@@ -99,15 +99,18 @@ request.setNotificationVisibility(dmg.VISIBILITY_VISIBLE);
 dmg.notificationvisibility = dmg.VISIBILITY_VISIBLE);
 
 ```
-### addRequestHeader()
+### addRequestHeader(key, value)
 
-You can some headers, ie. login/password
+Add an HTTP header to be included with the download request. The header will be added to the end of the list.
 
 ```javascript
 request.addRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
 ```
 
 ### setAllowedNetworkTypes()
+Restrict the types of networks over which this download may proceed. By default, all network types are allowed. Consider using `setAllowedOverMetered(boolean)` instead, since it's more flexible.
+
+As of Build.VERSION_CODES.N, setting only the NETWORK_WIFI flag here is equivalent to calling setAllowedOverMetered(boolean) with false.
 
 ```javascript
 request.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WIFI);
@@ -125,3 +128,5 @@ request.Description("Mein lustiger Titel");
 Sets the mime type in internal database.
 
 ### allowScanningByMediaScanner
+
+If the file to be downloaded is to be scanned by MediaScanner, this method should be called before `enqueue` is called.
