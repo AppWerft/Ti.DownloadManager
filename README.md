@@ -110,11 +110,34 @@ request.addRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
 ### setAllowedNetworkTypes()
 Restrict the types of networks over which this download may proceed. By default, all network types are allowed. Consider using `setAllowedOverMetered(boolean)` instead, since it's more flexible.
 
-As of Build.VERSION_CODES.N, setting only the NETWORK_WIFI flag here is equivalent to calling setAllowedOverMetered(boolean) with false.
+As of Build.VERSION\_CODES.N, setting only the NETWORK_WIFI flag here is equivalent to calling setAllowedOverMetered(boolean) with false.
 
 ```javascript
 request.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WIFI);
 ```
+
+### setAllowedOverMetered(boolean)
+Set whether this download may proceed over a metered network connection. By default, metered networks are allowed.
+
+
+### setAllowedOverMetered(boolean)
+Set whether this download may proceed over a metered network connection. By default, metered networks are allowed.
+
+
+### setAllowedOverRoaming(boolean) 
+Set whether this download may proceed over a roaming connection. By default, roaming is allowed.
+
+### setRequiresCharging(boolean)
+
+Specify that to run this download, the device needs to be plugged in. This defaults to false.
+
+
+### setRequiresDeviceIdle(boolean)
+
+Specify that to run, the download needs the device to be in idle mode. This defaults to false.
+
+Idle mode is a loose definition provided by the system, which means that the device is not in use, and has not been in use for some time.
+
 
 ### setDescription()
 ### setTitle()

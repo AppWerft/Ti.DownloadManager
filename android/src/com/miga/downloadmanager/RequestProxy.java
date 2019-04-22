@@ -52,6 +52,12 @@ public class RequestProxy extends KrollProxy {
 		return TiDownloadmanagerModule.dMgr.enqueue(request);
 	}
 
+	
+	@Kroll.method
+	public RequestProxy setAllowedOverMetered(boolean allow) {
+		request.	setAllowedOverMetered(allow);
+		return this;
+	}
 	@Kroll.method
 	public RequestProxy addRequestHeader(String k, String v) {
 		request.addRequestHeader(k, v);
