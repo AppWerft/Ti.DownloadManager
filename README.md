@@ -98,4 +98,27 @@ dmg.setNotificationVisibility(dmg.VISIBILITY_VISIBLE);
 dmg.notificationvisibility = dmg.VISIBILITY_VISIBLE);
 
 ```
+### addRequestHeader()
 
+You can some headers, ie. login/password
+
+```javascript
+dmg.addRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
+```
+
+### setAllowedNetworkTypes()
+
+```javascript
+dmg.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WIFI);
+```
+
+### setDescription()
+### setTitle()
+
+```javascript
+dmg.Description("Mein lustige Runterlade");
+dmg.Description("Mein lustiger Titel");
+
+```
+### setMimetype()
+Sets the mime type in internal database.
