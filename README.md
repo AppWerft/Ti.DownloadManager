@@ -37,7 +37,7 @@ function onDone(){
 
 # New interface
 
-New new interface followes mosly the pattern of native class [DownloadMananger](https://developer.android.com/reference/android/app/DownloadManager).
+New new interface followes mosly the pattern of native class [DownloadMananger](https://developer.android.com/reference/android/app/DownloadManager). The old interface is still working too.
 
 Every download creates a new download object and returns an id for subsequent operations:
 
@@ -98,3 +98,4 @@ dmg.setNotificationVisibility(dmg.VISIBILITY_VISIBLE);
 dmg.notificationvisibility = dmg.VISIBILITY_VISIBLE);
 
 ```
+
