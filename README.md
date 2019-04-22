@@ -130,3 +130,8 @@ Sets the mime type in internal database.
 ### allowScanningByMediaScanner
 
 If the file to be downloaded is to be scanned by MediaScanner, this method should be called before `enqueue` is called.
+
+
+### enqueue()
+
+The standard way is to use `dmg.enqueue(request);`; you can call `request.enqueue()` too.
