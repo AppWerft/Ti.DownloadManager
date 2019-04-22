@@ -54,8 +54,22 @@ public class RequestProxy extends KrollProxy {
 
 	
 	@Kroll.method
-	public RequestProxy setAllowedOverMetered(boolean allow) {
-		request.	setAllowedOverMetered(allow);
+@Kroll.setProperty
+	public RequestProxy setAllowedOverRoaming(boolean allow) {
+		request.	setAllowedOverRoaming(allow);
+		return this;
+	}
+	@Kroll.method
+	@Kroll.setProperty
+	public RequestProxy setRequiresCharging(boolean allow) {
+		request.setRequiresCharging(allow);
+		return this;
+	}
+	@Kroll.method
+	@Kroll.setProperty
+	public RequestProxy setRequiresDeviceIdle(boolean allow) {
+		
+		request.setRequiresDeviceIdle(allow);
 		return this;
 	}
 	@Kroll.method
@@ -71,12 +85,14 @@ public class RequestProxy extends KrollProxy {
 	}
 
 	@Kroll.method
+	@Kroll.setProperty
 	public RequestProxy setDescription(String descr) {
 		request.setDescription(descr);
 		return this;
 	}
 
 	@Kroll.method
+	@Kroll.setProperty
 	public RequestProxy setMimeType(String m) {
 		request.setMimeType(m);
 		return this;
