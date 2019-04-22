@@ -6,7 +6,7 @@
  * Please see the LICENSE included with this distribution for details.
  *
  */
-package com.miga.downloadmanager;
+package de.appwerft.downloadmanager;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -37,7 +37,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 
-@Kroll.module(name = "TiDownloadmanager", id = "com.miga.downloadmanager")
+@Kroll.module(name = "TiDownloadmanager", id = "de.appwerft.downloadmanager")
 public class TiDownloadmanagerModule extends KrollModule {
 
 	// Standard Debugging variables

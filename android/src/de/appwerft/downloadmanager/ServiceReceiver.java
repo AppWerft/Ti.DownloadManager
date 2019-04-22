@@ -1,4 +1,4 @@
-package com.miga.downloadmanager;
+package de.appwerft.downloadmanager;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

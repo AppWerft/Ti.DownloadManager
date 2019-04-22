@@ -12,7 +12,7 @@ copyright: Copyright (c) 2016 by Your Company
 
 # these should not be edited
 name: ti.downloadmanager
-moduleid: com.miga.downloadmanager
+moduleid: de.appwerft.downloadmanager
 guid: 76b6335c-caa6-48bc-876f-4db0b526e202
 platform: android
 minsdk: 7.0.0

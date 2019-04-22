@@ -6,7 +6,7 @@
  * Please see the LICENSE included with this distribution for details.
  *
  */
-package com.miga.downloadmanager;
+package de.appwerft.downloadmanager;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,30 +48,32 @@ public class RequestProxy extends KrollProxy {
 	}
 
 	@Kroll.method
-	public Long  enqueue() {
+	public Long enqueue() {
 		return TiDownloadmanagerModule.dMgr.enqueue(request);
 	}
 
-	
 	@Kroll.method
-@Kroll.setProperty
+	@Kroll.setProperty
 	public RequestProxy setAllowedOverRoaming(boolean allow) {
-		request.	setAllowedOverRoaming(allow);
+		request.setAllowedOverRoaming(allow);
 		return this;
 	}
+
 	@Kroll.method
 	@Kroll.setProperty
 	public RequestProxy setRequiresCharging(boolean allow) {
 		request.setRequiresCharging(allow);
 		return this;
 	}
+
 	@Kroll.method
 	@Kroll.setProperty
 	public RequestProxy setRequiresDeviceIdle(boolean allow) {
-		
+
 		request.setRequiresDeviceIdle(allow);
 		return this;
 	}
+
 	@Kroll.method
 	public RequestProxy addRequestHeader(String k, String v) {
 		request.addRequestHeader(k, v);
@@ -109,11 +111,11 @@ public class RequestProxy extends KrollProxy {
 		request.setTitle(t);
 		return this;
 	}
-	
+
 	@Kroll.method
 	public RequestProxy allowScanningByMediaScanner() {
 		request.allowScanningByMediaScanner();
 		return this;
 	}
-	
+
 }
