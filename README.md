@@ -110,7 +110,28 @@ dmg.enqueue(request
 	.setTitle("mytitle")
 	.setDescription("longer Text"););
 ```
- 
+## Methods of module
+
+### createRequest(Url) : Request
+This method creates an empty request.
+
+### enqueue(request) : long
+Enqueue a new download. The download will start automatically once the download manager is ready to execute it and connectivity is available. It returns a long for id.
+
+### getAllDownloads()
+### getPendingDownloads()
+### getFailedDownloads()
+### getPausedDownloads()
+### getRunningDownloads()
+### getSuccessfulDownloads()
+### remove(ids) : int
+
+Cancel downloads and remove them from the download manager. Each download will be stopped if it was running, and it will no longer be accessible through the download manager. If there is a downloaded file, partial or complete, it is deleted.
+
+#### Parameter
+Array of Ids (numbers)
+#### Returns
+the number of downloads actually removed
 
 ## Methods of Request
 ### setNotificationVisibility()
