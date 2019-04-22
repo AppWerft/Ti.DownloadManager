@@ -11,20 +11,12 @@ package com.miga.downloadmanager;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.TiC;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiConfig;
-import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiCompositeLayout;
-import org.appcelerator.titanium.view.TiCompositeLayout.LayoutArrangement;
-import org.appcelerator.titanium.view.TiUIView;
 
-import android.app.Activity;
 import android.app.DownloadManager;
 import android.net.Uri;
 
@@ -56,6 +48,11 @@ public class RequestProxy extends KrollProxy {
 	}
 
 	@Kroll.method
+	public void enqueue() {
+		TiDownloadmanagerModule.dMgr.enqueue(request);
+	}
+
+	@Kroll.method
 	public RequestProxy addRequestHeader(String k, String v) {
 		request.addRequestHeader(k, v);
 		return this;
@@ -78,13 +75,15 @@ public class RequestProxy extends KrollProxy {
 		request.setMimeType(m);
 		return this;
 	}
+
 	@Kroll.method
-	public RequestProxy  setNotificationVisibility(int v) {
+	public RequestProxy setNotificationVisibility(int v) {
 		request.setNotificationVisibility(v);
 		return this;
 	}
+
 	@Kroll.method
-	public RequestProxy  setTitle(String t) {
+	public RequestProxy setTitle(String t) {
 		request.setTitle(t);
 		return this;
 	}

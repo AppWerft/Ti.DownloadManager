@@ -8,34 +8,34 @@
  */
 package com.miga.downloadmanager;
 
-import org.appcelerator.kroll.KrollModule;
-
-import android.net.ConnectivityManager;
-import org.appcelerator.kroll.annotations.Kroll;
-
-import org.appcelerator.titanium.TiApplication;
-import org.appcelerator.titanium.TiC;
-import org.appcelerator.kroll.common.Log;
-import org.appcelerator.kroll.common.TiConfig;
-import org.appcelerator.kroll.KrollDict;
-import android.app.DownloadManager;
-import android.app.Activity;
-import android.net.Uri;
-import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.io.TiBaseFile;
-import org.appcelerator.titanium.io.TiFileFactory;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
-import org.appcelerator.kroll.KrollFunction;
-import java.util.HashMap;
-import java.util.List;
-
-import android.content.Intent;
-import android.database.Cursor;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.KrollModule;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.kroll.common.Log;
+import org.appcelerator.kroll.common.TiConfig;
+import org.appcelerator.titanium.TiApplication;
+import org.appcelerator.titanium.TiC;
+import org.appcelerator.titanium.io.TiBaseFile;
+import org.appcelerator.titanium.io.TiFileFactory;
+import org.appcelerator.titanium.util.TiConvert;
+
+import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.Uri;
 
 @Kroll.module(name = "TiDownloadmanager", id = "com.miga.downloadmanager")
 public class TiDownloadmanagerModule extends KrollModule {
@@ -119,7 +119,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 	private static TiApplication tiapp;
 	private Activity activity = appContext.getCurrentActivity();
 
-	private DownloadManager dMgr;
+	public static DownloadManager dMgr;
 	private KrollFunction callback;
 	private String eventName = "DownloadReady";
 	private int notificationvisibility = 0;
@@ -133,7 +133,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		ServiceReceiver service = new ServiceReceiver(this);
 		activity.registerReceiver(service, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 		activity.registerReceiver(service, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
-		dMgr = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
+		dMgr = (DownloadManager) appContext.getSystemService(Context.DOWNLOAD_SERVICE);
 	}
 
 	@Kroll.onAppCreate
@@ -310,18 +310,16 @@ public class TiDownloadmanagerModule extends KrollModule {
 		if (o instanceof Long) {
 			return dMgr.remove((Long) o);
 		}
-		/* Titanium uses an array of numbers: */
+		/* Titanium uses an array of (long) numbers: */
 		if (o instanceof Object[]) {
-			List<Long> list = new ArrayList<Long>();
+			long[] longlist = new long[Array.getLength(o)];
+			int ndx=0;
 			for (Object e : (Object[])o) {
 				if (e instanceof Long) {
-					list.add((Long)e);
-				}	
+					longlist[ndx] = (Long)e;
+					ndx++;}	
 			}
-			long[] primitives = new long[list.size()];
-		    for (int i = 0; i < list.size(); i++)
-		         primitives[i] = list.get(i);
-			dMgr.remove(primitives);	
+			dMgr.remove(longlist);	
 		}
 		return 0;
 		

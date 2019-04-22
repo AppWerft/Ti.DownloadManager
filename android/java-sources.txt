@@ -1,7 +1,6 @@
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/com.miga.downloadmanager/android/src/com/miga/downloadmanager/RequestProxy.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/com.miga.downloadmanager/android/src/com/miga/downloadmanager/ServiceReceiver.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/com.miga.downloadmanager/android/src/com/miga/downloadmanager/TiDownloadmanagerModule.java"
-"/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/com.miga.downloadmanager/android/build/generated/java/com/miga/downloadmanager/TiDownloadmanagerBootstrap.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/com.miga.downloadmanager/android/build/generated/r/android/support/compat/R.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/com.miga.downloadmanager/android/build/generated/r/android/support/coreui/R.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/com.miga.downloadmanager/android/build/generated/r/android/support/coreutils/R.java"

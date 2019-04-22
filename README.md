@@ -37,7 +37,7 @@ function onDone(){
 
 # New interface
 
-New new interface followes the pattern of native class `DownloadMananger`.
+New new interface followes mosly the pattern of native class [DownloadMananger](https://developer.android.com/reference/android/app/DownloadManager).
 
 Every download creates a new download object and returns an id for subsequent operations:
 
@@ -54,6 +54,17 @@ dmg.remove(id);
 dmg.remove([id1,id2,id3 … ]);
 ```
 
+### Events
+The back communication from downloader to the JS-layer works by Ti.App event. 
+There are two events:
+
+#### DownloadReady
+Will fired if a single download is ready. You will get the id.
+
+
+#### DownloadComplete
+Will fired if all downloads are completed.
+
 A request without parameters works with defaults properties. You can modify by some methods:
 
 ```js
@@ -65,8 +76,8 @@ dmg.enqueue(request
 ```
  
 
-# Methods of Request
-## setNotificationVisibility()
+## Methods of Request
+### setNotificationVisibility()
 
 This method is to control whether a system notification is shown while this download is running or when it is completed.
 It can takes any of the following predefined values: 
