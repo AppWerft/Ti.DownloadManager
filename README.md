@@ -93,7 +93,8 @@ If set to VISIBILITY\_HIDDEN, this requires the permission android.permission.DO
 ``` 
 
 ```js
-dmg.setNotificationVisibility(dmg.VISIBILITY_VISIBLE);
+const request = dmg.createRequest("https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=2ahUKEwj_qcCMpuPhAhXKjqQKHSStAyQQjRx6BAgBEAU&url=https%3A%2F%2Fwww.reddit.com%2Fr%2Faww%2Fcomments%2F44kods%2Ffluffy_ginger_sweet_cat_baby%2F&psig=AOvVaw2eJv4WrHs6itSdoJJeMZyN&ust=1556008655862323");
+request.setNotificationVisibility(dmg.VISIBILITY_VISIBLE);
 // or
 dmg.notificationvisibility = dmg.VISIBILITY_VISIBLE);
 
@@ -103,21 +104,21 @@ dmg.notificationvisibility = dmg.VISIBILITY_VISIBLE);
 You can some headers, ie. login/password
 
 ```javascript
-dmg.addRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
+request.addRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
 ```
 
 ### setAllowedNetworkTypes()
 
 ```javascript
-dmg.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WIFI);
+request.setAllowedNetworkTypes(Ti.Network.NETWORK_MOBILE | Ti.Network.NETWORK_WIFI);
 ```
 
 ### setDescription()
 ### setTitle()
 
 ```javascript
-dmg.Description("Mein lustige Runterlade");
-dmg.Description("Mein lustiger Titel");
+request.Description("Mein lustige Runterlade");
+request.Description("Mein lustiger Titel");
 
 ```
 ### setMimetype()
