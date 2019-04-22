@@ -5,7 +5,7 @@
 Use the Android default DownloadManager to download files in the background. It will open the system download list when you click on the notification.
 
 ~~~javascript
-var dmg = require("com.miga.downloadmanager");
+var dmg = require("de.appwerft.downloadmanager");
 
 var filename = url.substring(url.lastIndexOf('/') + 1);
 var file = Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, filename).nativePath;
