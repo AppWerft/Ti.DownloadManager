@@ -272,7 +272,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		ArrayList<HashMap> downList = new ArrayList<HashMap>();
 		DownloadManager.Query query = new DownloadManager.Query();
 		query.setFilterById(ids);
-		Log.d(LCAT,"IDs:" + ids);
+		Log.d(LCAT,"IDs:" + ids);	
 		Cursor c = dMgr.query(query);
 		c.moveToFirst();
 		while (c.moveToNext()) {
@@ -345,16 +345,13 @@ public class TiDownloadmanagerModule extends KrollModule {
 	public void done(Long id) {
 		Log.d(LCAT,"done in module id=" + id);
 		KrollDict event = getDownloadById(id);
-		/* sends an event to tiapp, every part of app can receive */
-		tiapp.fireAppEvent("downloadmanager.done", event);
 		/* send to instances of module, (require('de.appwert.downloadmanager')) */
 		sendBack(event, Constants.PROPERTY_EVENT_ONDONE);
 	}
 
 	public void complete() {
-		Log.d(LCAT,"complete in module");
+		Log.d(LCAT,"complete in krollmodule");
 		KrollDict event = new KrollDict();
-		tiapp.fireAppEvent("downloadmanager..complete", event);
 		sendBack(event, Constants.PROPERTY_EVENT_ONCOMPLETE);
 	}
 
@@ -427,8 +424,10 @@ public class TiDownloadmanagerModule extends KrollModule {
 			Object o = getProperty(prop);
 			if (o instanceof KrollFunction) {
 				((KrollFunction) o).callAsync(getKrollObject(), event);
-			}
-		}
+			} else Log.w(LCAT, "module has  prop '"+prop+"', but isn't a callback");
+		} else Log.w(LCAT, "module has not callback prop '"+prop+"'");
+	    String name = "downloadmanager:"+ prop;
+	    tiapp.fireAppEvent(name, event);
 	}
 
 	private void getInstance() {
