@@ -177,7 +177,7 @@ This method sets the destination path. As parameter you can use a TiFile (see ex
 ```javascript
 const filename = url.substring(url.lastIndexOf('/') + 1);
 const tifile = Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, filename);
-request.setDestinationUri(tifile);
+request.setDestinationFile(tifile);
 ```
 
 ### addRequestHeader(key, value)
