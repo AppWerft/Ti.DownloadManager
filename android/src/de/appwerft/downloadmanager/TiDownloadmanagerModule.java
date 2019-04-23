@@ -370,14 +370,8 @@ public class TiDownloadmanagerModule extends KrollModule {
 	/* Titaniums Javascript uses an array of long */
 	/* API aspects Long... */
 	@Kroll.method
-	public int removeDownloadById(Object o) {
-		/* Titanium give us one long id: */
-		if (o instanceof Long) {
-			return dMgr.remove((Long) o);
-		} else {
-			Log.w(LCAT,"removeDownloadById() aspects an id (number)" );
-			return 0;
-		}
+	public int removeDownloadById(long id) {
+			return dMgr.remove(id);
 	}
 	
 	@Kroll.method 
