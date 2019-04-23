@@ -170,7 +170,7 @@ request.setNotificationVisibility(dmg.VISIBILITY_VISIBLE);
 dmg.notificationvisibility = dmg.VISIBILITY_VISIBLE);
 ```
 
-### setDestinationUri(String|File)
+### setDestinationFile(String|File)
 
 This method sets the destination path. As parameter you can use a TiFile (see example). 
 

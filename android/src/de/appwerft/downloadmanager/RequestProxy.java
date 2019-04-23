@@ -99,7 +99,7 @@ public class RequestProxy extends KrollProxy {
 	}
 
 	@Kroll.method
-	public RequestProxy setDestinationUri(Object readPath) {
+	public RequestProxy setDestinationFile(Object readPath) {
 		/* this is the example pattern for importing files in Titanium: 
 		 * reads all kinds of files
 		 * */
