@@ -3,6 +3,7 @@
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.DownloadManager/android/src/de/appwerft/downloadmanager/RequestProxy.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.DownloadManager/android/src/de/appwerft/downloadmanager/ServiceReceiver.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.DownloadManager/android/src/de/appwerft/downloadmanager/TiDownloadmanagerModule.java"
+"/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.DownloadManager/android/build/generated/java/de/appwerft/downloadmanager/TiDownloadmanagerBootstrap.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.DownloadManager/android/build/generated/r/android/support/compat/R.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.DownloadManager/android/build/generated/r/android/support/coreui/R.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/AUDIO/Ti.DownloadManager/android/build/generated/r/android/support/coreutils/R.java"
