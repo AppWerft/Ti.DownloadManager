@@ -31,9 +31,19 @@ import android.net.Uri;
 public class RequestProxy extends KrollProxy {
 
 	// Standard Debugging variables
-	private static final String LCAT = "ExampleProxy";
-	private static final boolean DBG = TiConfig.LOGD;
+	private static final String LCAT = TiDownloadmanagerModule.LCAT;
+	
+	@Kroll.constant
+	public static int VISIBILITY_VISIBLE = DownloadManager.Request.VISIBILITY_VISIBLE;
+	@Kroll.constant
+	public static int VISIBILITY_HIDDEN = DownloadManager.Request.VISIBILITY_HIDDEN;
+	@Kroll.constant
+	public static int VISIBILITY_VISIBLE_NOTIFY_COMPLETED = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+	@Kroll.constant
+	public static int VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION;
+	
 	public DownloadManager.Request request;
+	
 
 	public RequestProxy() {
 		super();
@@ -101,7 +111,8 @@ public class RequestProxy extends KrollProxy {
 	@Kroll.method
 	public RequestProxy setDestinationFile(Object readPath) {
 		/* this is the example pattern for importing files in Titanium: 
-		 * reads all kinds of files
+		 * reads all kinds of file
+		 * 
 		 * */
 		try {
 			TiBaseFile inputFile = null;

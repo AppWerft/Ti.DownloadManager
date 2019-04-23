@@ -156,6 +156,7 @@ It can takes any of the following predefined values:
 * VISIBILITY\_HIDDEN
 * VISIBILITY\_VISIBLE 
 * VISIBILITY\_VISIBLE\_NOTIFY\_COMPLETED
+* VISIBILITY\_VISIBLE\_NOTIFY\_ONLY\_COMPLETION
 
 If set to VISIBILITY\_HIDDEN, this requires the permission android.permission.DOWNLOAD\_WITHOUT\_NOTIFICATION.
 

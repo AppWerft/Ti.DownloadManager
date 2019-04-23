@@ -9,14 +9,11 @@
 package de.appwerft.downloadmanager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
@@ -39,16 +36,23 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import ti.modules.titanium.filesystem.FileProxy;
 
 @Kroll.module(name = "TiDownloadmanager", id = "de.appwerft.downloadmanager", propertyAccessors = {
 		Constants.PROPERTY_EVENT_ONDONE, Constants.PROPERTY_EVENT_ONCOMPLETE })
 public class TiDownloadmanagerModule extends KrollModule {
 
-	// Standard Debugging variables
-	private static final String LCAT = "TiDownloadmanagerModule";
-	private static final boolean DBG = TiConfig.LOGD;
+	public static final String LCAT = "TiDownloader";
 
+	@Kroll.constant
+	public static int VISIBILITY_VISIBLE = DownloadManager.Request.VISIBILITY_VISIBLE;
+	@Kroll.constant
+	public static int VISIBILITY_HIDDEN = DownloadManager.Request.VISIBILITY_HIDDEN;
+	@Kroll.constant
+	public static int VISIBILITY_VISIBLE_NOTIFY_COMPLETED = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+	@Kroll.constant
+	public static int VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION;
+	
+	
 	@Kroll.constant
 	public static int COLUMN_REASON_PAUSED_QUEUED_FOR_WIFI = DownloadManager.PAUSED_QUEUED_FOR_WIFI;
 
@@ -445,12 +449,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		}
 		return longlist;
 	}
-	
 }
-
-	
-	
-
 	
 	
 	
