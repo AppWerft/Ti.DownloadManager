@@ -250,11 +250,11 @@ public class TiDownloadmanagerModule extends KrollModule {
 	}
 
 	@Kroll.method
-	public Object[] getDownloadById(Object o) {
+	public KrollDict getDownloadById(Object o) {
 		if (o instanceof Long) {
-
 			long[] ids = { (long) o };
-			return _getDownloadsByIds(ids);
+			Object[] res = _getDownloadsByIds(ids);
+			return (KrollDict)res[0];
 		} else {
 			Log.w(LCAT, "getDownloadById() aspects long, but got " + o.getClass().getSimpleName());
 			return null;
@@ -338,10 +338,9 @@ public class TiDownloadmanagerModule extends KrollModule {
 
 	/* these 3 method will called from ServiceReceiver */
 	public void done(Long id) {
-		KrollDict event = new KrollDict();
-		event.put("id", id);
+		KrollDict event = getDownloadById(id);
 		/* sends an event to tiapp, every part of app can receive */
-		tiapp.fireAppEvent("downloadmanager.done", event);
+		tiapp.fireAppEvent("downloadmanager.done", even);
 		/* send to instances of module, (require('de.appwert.downloadmanager')) */
 		sendBack(event, Constants.PROPERTY_EVENT_ONDONE);
 	}
