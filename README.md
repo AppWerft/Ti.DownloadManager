@@ -37,13 +37,13 @@ dmg.getSuccessfulDownloads();
 ```
 ### Events
 
-For proceeding og callbacks you have two ways: app event listeners and hooks of module.
+For proceeding of callbacks you have two ways: app event listeners and hooks of module.
 
 #### onDone 
 This event will trigger by download of a single file:
 
 ```js
-Ti.App.addEventListener('downloadmananger.ondone',function(e) {
+Ti.App.addEventListener('downloadmanager:onDone',function(e) {
 	console.log(e.id);
 });
 ```
@@ -59,7 +59,7 @@ dmg.onDone = function(e) {
 This event will trigger by download of a single file:
 
 ```js
-Ti.App.addEventListener('downloadmananger.oncomplete',function(e) {
+Ti.App.addEventListener('downloadmanager:onComplete',function(e) {
 	console.log(e);
 });
 ```
