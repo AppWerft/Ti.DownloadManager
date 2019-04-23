@@ -135,6 +135,14 @@ Array of Ids (numbers)
 #### Returns
 the number of downloads actually removed
 
+
+### getMaxBytesOverMobile()
+Returns maximum size, in bytes, of downloads that may go over a mobile connection; or null if there's no limit 
+
+### getMimeTypeForDownloadedFile(number id)
+Returns the media type of the given downloaded file id, if the file was downloaded successfully. 
+
+
 ## Methods of Request
 ### setNotificationVisibility()
 

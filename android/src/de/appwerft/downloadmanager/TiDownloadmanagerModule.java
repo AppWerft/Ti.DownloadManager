@@ -37,7 +37,8 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 
-@Kroll.module(name = "TiDownloadmanager", id = "de.appwerft.downloadmanager",propertyAccessors = { "onDone","onComplete" })
+@Kroll.module(name = "TiDownloadmanager", id = "de.appwerft.downloadmanager", propertyAccessors = {
+		Constants.PROPERTY_EVENT_ONDONE, Constants.PROPERTY_EVENT_ONCOMPLETE })
 public class TiDownloadmanagerModule extends KrollModule {
 
 	// Standard Debugging variables
@@ -83,7 +84,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 	public static final int ERROR_UNHANDLED_HTTP_CODE = DownloadManager.ERROR_UNHANDLED_HTTP_CODE;
 	@Kroll.constant
 	public static final int ERROR_UNKNOWN = DownloadManager.ERROR_UNKNOWN;
-	
+
 	public static final int STATUS_ALL = 0;
 
 	@Kroll.constant
@@ -123,8 +124,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 	private KrollFunction callback;
 	private String eventName = "DownloadReady";
 	private int notificationvisibility = 0;
-	
-	
+
 	private int allowedNetworkTypes = ConnectivityManager.TYPE_MOBILE | ConnectivityManager.TYPE_WIFI
 			| ConnectivityManager.TYPE_VPN;
 
@@ -138,28 +138,24 @@ public class TiDownloadmanagerModule extends KrollModule {
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
-		tiapp=app;
+		tiapp = app;
 	}
 
-	
-	@Kroll.method
-	@Kroll.setProperty
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
 	@Kroll.method
 	public Long startDownload(KrollDict dict) {
 		if (dict.containsKeyAndNotNull("success")) {
 			Object o = dict.get("success");
 			if (o instanceof KrollFunction) {
 				callback = (KrollFunction) dict.get("success");
-				Log.d(LCAT,"success callback successfull registered");
-			} else Log.w(LCAT,"success isn't a callback");
-		} else  Log.w(LCAT,"missing success property");
+				Log.d(LCAT, "success callback successfull registered");
+			} else
+				Log.w(LCAT, "success isn't a callback");
+		} else
+			Log.w(LCAT, "missing success property");
 		if (dict.containsKeyAndNotNull(TiC.PROPERTY_URL)) {
 			try {
-			    new URI(dict.getString(TiC.PROPERTY_URL));
-			    return _startDownload(dict);
+				new URI(dict.getString(TiC.PROPERTY_URL));
+				return _startDownload(dict);
 			} catch (URISyntaxException e) {
 				Log.e(LCAT, "url is not valid");
 				return new Long(0);
@@ -167,17 +163,20 @@ public class TiDownloadmanagerModule extends KrollModule {
 		}
 		return new Long(0);
 	}
-	
+
 	@Kroll.method
 	public void setAllowedNetworkTypes(int allowedNetworkTypes) {
 		this.allowedNetworkTypes = allowedNetworkTypes;
 	}
 
-	
-
 	@Kroll.method
 	public Long getMaxBytesOverMobile() {
-		return  DownloadManager.getMaxBytesOverMobile(appContext);
+		return DownloadManager.getMaxBytesOverMobile(appContext);
+	}
+
+	@Kroll.method
+	public String getMimeTypeForDownloadedFile(Long id) {
+		return getMimeTypeForDownloadedFile(id);
 	}
 
 	@Kroll.method
@@ -242,14 +241,41 @@ public class TiDownloadmanagerModule extends KrollModule {
 		return res;
 	}
 
+	@Kroll.method
+	public Object[] getDownloadsById(Object arg) {
+		getInstance();
+		ArrayList<HashMap> downList = new ArrayList<HashMap>();
+		DownloadManager.Query query = new DownloadManager.Query();
+		query.setFilterById(importLongList(arg));
+		Cursor c = dMgr.query(query);
+		c.moveToFirst();
+		while (c.moveToNext()) {
+			HashMap<String, Object> dl = new HashMap<String, Object>();
+			String filename = null;
+			String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+			if (downloadFileLocalUri != null) {
+				File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
+				filename = mFile.getAbsolutePath();
+			}
+			int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+			int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+			dl.put("status", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+			dl.put("filename", filename);
+			dl.put("size_total", bytes_total);
+			dl.put("size_downloaded", bytes_downloaded);
+			dl.put("reason", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
+			dl.put("title", c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE)));
+			dl.put("mediatype", c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)));
+		}
+		c.close();
+		return downList.toArray();
+	}
+
 	private Object[] _getDownloads(int status) {
 		@SuppressWarnings("rawtypes")
 		ArrayList<HashMap> downList = new ArrayList<HashMap>();
 		DownloadManager.Query query = new DownloadManager.Query();
-		if (dMgr == null) {
-			dMgr = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
-			return downList.toArray();
-		}
+		getInstance();
 		Cursor c = dMgr.query(query);
 		c.moveToFirst();
 		while (c.moveToNext()) {
@@ -281,36 +307,33 @@ public class TiDownloadmanagerModule extends KrollModule {
 		return downList.toArray();
 	}
 
+	/* these 3 method will called from ServiceReceiver */
 	public void done(Long id) {
 		KrollDict event = new KrollDict();
-		event.put("id" ,id);
-		if (callback != null) {
-			callback.call(getKrollObject(), event);
-		}
-		tiapp.fireAppEvent("downloadmanager.done",event );
+		event.put("id", id);
+		/* sends an event to tiapp, every part of app can receive */
+		tiapp.fireAppEvent("downloadmanager.done", event);
+		/* send to instances of module, (require('de.appwert.downloadmanager')) */
+		sendBack(event, Constants.PROPERTY_EVENT_ONDONE);
 	}
 
 	public void complete() {
 		KrollDict event = new KrollDict();
-		if (callback != null) {
-			callback.call(getKrollObject(), event);
-		}
-		tiapp.fireAppEvent("downloadmanager..complete",event );
+		tiapp.fireAppEvent("downloadmanager..complete", event);
+		sendBack(event, Constants.PROPERTY_EVENT_ONCOMPLETE);
 	}
+
 	public void cancel() {
 		Intent pageView = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
 		pageView.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		appContext.startActivity(pageView);
 	}
 
-	
-
-	
 	@Kroll.method
 	public Long enqueue(RequestProxy proxy) {
 		return dMgr.enqueue(proxy.request);
 	}
-	
+
 	/* Titaniums Javascript uses an array og long */
 	/* API aspects Long... */
 	@Kroll.method
@@ -322,35 +345,32 @@ public class TiDownloadmanagerModule extends KrollModule {
 		/* Titanium uses an array of (long) numbers: */
 		if (o instanceof Object[]) {
 			long[] longlist = new long[Array.getLength(o)];
-			int ndx=0;
-			for (Object e : (Object[])o) {
+			int ndx = 0;
+			for (Object e : (Object[]) o) {
 				if (e instanceof Long) {
-					longlist[ndx] = (Long)e;
-					ndx++;}	
+					longlist[ndx] = (Long) e;
+					ndx++;
+				}
 			}
-			dMgr.remove(longlist);	
+			dMgr.remove(longlist);
 		}
 		return 0;
-		
+
 	}
-	
 
-
-	
 	private Long _startDownload(KrollDict dict) {
-		
 		DownloadManager.Request dmReq = new DownloadManager.Request(Uri.parse(dict.getString(TiC.PROPERTY_URL)));
 		dmReq.setTitle(TiConvert.toString(dict, "title"));
 		dmReq.setDescription(TiConvert.toString(dict, "description"));
 		if (dict.containsKeyAndNotNull("notificationvisible"))
-			
-		//https://stackoverflow.com/questions/9345977/downloadmanager-request-setnotificationvisibility-fails-with-jsecurityexception
-		
-		if (dict.containsKeyAndNotNull(ALLOWED_NETWORK_TYPES)) {
-			dmReq.setAllowedNetworkTypes(dict.getInt(ALLOWED_NETWORK_TYPES));
-		} else {
-			dmReq.setAllowedNetworkTypes(allowedNetworkTypes);
-		}
+
+			// https://stackoverflow.com/questions/9345977/downloadmanager-request-setnotificationvisibility-fails-with-jsecurityexception
+
+			if (dict.containsKeyAndNotNull(ALLOWED_NETWORK_TYPES)) {
+				dmReq.setAllowedNetworkTypes(dict.getInt(ALLOWED_NETWORK_TYPES));
+			} else {
+				dmReq.setAllowedNetworkTypes(allowedNetworkTypes);
+			}
 		if (dict.containsKeyAndNotNull("allowedOverMetered")) {
 			dmReq.setAllowedOverMetered(dict.getBoolean("allowedOverMetered"));
 		}
@@ -362,6 +382,42 @@ public class TiDownloadmanagerModule extends KrollModule {
 				false);
 		dmReq.setDestinationUri(Uri.fromFile(file.getNativeFile()));
 		return dMgr.enqueue(dmReq);
+	}
+
+	/* Titanium calls a function on JS layer */
+	private void sendBack(KrollDict event, String prop) {
+		if (hasProperty(prop)) {
+			Object o = getProperty(prop);
+			if (o instanceof KrollFunction) {
+				((KrollFunction) o).callAsync(getKrollObject(), event);
+			}
+		}
+	}
+
+	private void getInstance() {
+		if (dMgr == null) {
+			dMgr = (DownloadManager) appContext.getSystemService(Context.DOWNLOAD_SERVICE);
+		}
+	}
+	
+	private long[] importLongList(Object arg) {
+		int ndx = 0;
+		long[] longlist = null;
+
+		if (arg instanceof Long) {
+			longlist = new long[1];
+			longlist[0] = (Long) arg;
+		}
+		else if (arg instanceof Object[]) {
+			longlist = new long[Array.getLength(arg)];
+			for (Object e : (Object[]) arg) {
+				if (e instanceof Long) {
+					longlist[ndx] = (Long) e;
+					ndx++;
+				}
+			}
+		}
+		return longlist;
 	}
 
 }
