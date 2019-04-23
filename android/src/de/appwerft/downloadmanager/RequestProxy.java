@@ -102,7 +102,6 @@ public class RequestProxy extends KrollProxy {
 	}
 
 	@Kroll.method
-	@Kroll.setProperty
 	public RequestProxy setDescription(String descr) {
 		request.setDescription(descr);
 		return this;

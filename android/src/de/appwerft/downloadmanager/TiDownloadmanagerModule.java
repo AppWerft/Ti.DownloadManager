@@ -340,7 +340,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 	public void done(Long id) {
 		KrollDict event = getDownloadById(id);
 		/* sends an event to tiapp, every part of app can receive */
-		tiapp.fireAppEvent("downloadmanager.done", even);
+		tiapp.fireAppEvent("downloadmanager.done", event);
 		/* send to instances of module, (require('de.appwert.downloadmanager')) */
 		sendBack(event, Constants.PROPERTY_EVENT_ONDONE);
 	}
