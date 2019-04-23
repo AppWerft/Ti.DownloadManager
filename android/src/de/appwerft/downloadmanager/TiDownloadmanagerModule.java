@@ -271,21 +271,26 @@ public class TiDownloadmanagerModule extends KrollModule {
 		getInstance();
 		ArrayList<HashMap> downList = new ArrayList<HashMap>();
 		DownloadManager.Query query = new DownloadManager.Query();
-		query.setFilterById();
+		query.setFilterById(ids);
+		Log.d(LCAT,"IDs:" + ids);
 		Cursor c = dMgr.query(query);
 		c.moveToFirst();
 		while (c.moveToNext()) {
 			HashMap<String, Object> dl = new HashMap<String, Object>();
 			String filename = null;
+			TiFileProxy fileproxy =null;
 			String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 			if (downloadFileLocalUri != null) {
 				File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
 				filename = mFile.getAbsolutePath();
+				fileproxy = new TiFileProxy(TiFileFactory.createTitaniumFile(new String[] { downloadFileLocalUri }, false));
 			}
 			int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
 			int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 			dl.put("status", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
 			dl.put("filename", filename);
+			dl.put("file", fileproxy);
+			
 			dl.put("size_total", bytes_total);
 			dl.put("size_downloaded", bytes_downloaded);
 			dl.put("reason", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
@@ -338,7 +343,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 
 	/* these 3 method will called from ServiceReceiver */
 	public void done(Long id) {
-		Log.d(LCAT,"done in module " + id);
+		Log.d(LCAT,"done in module id=" + id);
 		KrollDict event = getDownloadById(id);
 		/* sends an event to tiapp, every part of app can receive */
 		tiapp.fireAppEvent("downloadmanager.done", event);
