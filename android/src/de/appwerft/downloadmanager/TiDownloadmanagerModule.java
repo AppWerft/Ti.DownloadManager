@@ -371,7 +371,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 	/* API aspects Long... */
 	@Kroll.method
 	public int removeDownloadById(long id) {
-			return dMgr.remove(id);
+		return dMgr.remove(id);
 	}
 	
 	@Kroll.method 
