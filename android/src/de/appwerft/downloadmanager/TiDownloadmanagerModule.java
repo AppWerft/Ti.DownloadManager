@@ -9,6 +9,8 @@
 package de.appwerft.downloadmanager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,6 +26,7 @@ import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiConfig;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiC;
+import org.appcelerator.titanium.TiFileProxy;
 import org.appcelerator.titanium.io.TiBaseFile;
 import org.appcelerator.titanium.io.TiFileFactory;
 import org.appcelerator.titanium.util.TiConvert;
@@ -36,6 +39,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import ti.modules.titanium.filesystem.FileProxy;
 
 @Kroll.module(name = "TiDownloadmanager", id = "de.appwerft.downloadmanager", propertyAccessors = {
 		Constants.PROPERTY_EVENT_ONDONE, Constants.PROPERTY_EVENT_ONCOMPLETE })
@@ -242,11 +246,28 @@ public class TiDownloadmanagerModule extends KrollModule {
 	}
 
 	@Kroll.method
-	public Object[] getDownloadsById(Object arg) {
+	public Object[] getDownloadById(Object o) {
+		if (o instanceof Long) {
+
+			long[] ids = { (long) o };
+			return _getDownloadsByIds(ids);
+		} else {
+			Log.w(LCAT, "getDownloadById() aspects long, but got " + o.getClass().getSimpleName());
+			return null;
+		}
+	}
+
+	@Kroll.method
+	public Object[] getDownloadsByIds(Object args) {
+		return _getDownloadsByIds(importLongList(args));
+	}
+
+	@SuppressWarnings("rawtypes")
+	private Object[] _getDownloadsByIds(long[] ids) {
 		getInstance();
 		ArrayList<HashMap> downList = new ArrayList<HashMap>();
 		DownloadManager.Query query = new DownloadManager.Query();
-		query.setFilterById(importLongList(arg));
+		query.setFilterById();
 		Cursor c = dMgr.query(query);
 		c.moveToFirst();
 		while (c.moveToNext()) {
@@ -281,15 +302,19 @@ public class TiDownloadmanagerModule extends KrollModule {
 		while (c.moveToNext()) {
 			HashMap<String, Object> dl = new HashMap<String, Object>();
 			String filename = null;
+			TiFileProxy fileproxy =null;
 			String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 			if (downloadFileLocalUri != null) {
 				File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
 				filename = mFile.getAbsolutePath();
+				fileproxy = new TiFileProxy(TiFileFactory.createTitaniumFile(new String[] { downloadFileLocalUri }, false));
 			}
 			int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
 			int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 			dl.put("status", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
 			dl.put("filename", filename);
+			dl.put("file", fileproxy);
+			
 			dl.put("size_total", bytes_total);
 			dl.put("size_downloaded", bytes_downloaded);
 			dl.put("reason", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
@@ -334,28 +359,30 @@ public class TiDownloadmanagerModule extends KrollModule {
 		return dMgr.enqueue(proxy.request);
 	}
 
-	/* Titaniums Javascript uses an array og long */
+	/* Titaniums Javascript uses an array of long */
 	/* API aspects Long... */
 	@Kroll.method
-	public int remove(Object o) {
+	public int removeDownloadById(Object o) {
 		/* Titanium give us one long id: */
 		if (o instanceof Long) {
 			return dMgr.remove((Long) o);
+		} else {
+			Log.w(LCAT,"removeDownloadById() aspects an id (number)" );
+			return 0;
 		}
-		/* Titanium uses an array of (long) numbers: */
-		if (o instanceof Object[]) {
-			long[] longlist = new long[Array.getLength(o)];
-			int ndx = 0;
-			for (Object e : (Object[]) o) {
-				if (e instanceof Long) {
-					longlist[ndx] = (Long) e;
-					ndx++;
-				}
-			}
-			dMgr.remove(longlist);
-		}
+	}
+	
+	@Kroll.method 
+	public TiFileProxy getTiFileForDownloadedFile(Long id) {
+		Uri uri= dMgr.getUriForDownloadedFile(id);
+		return new TiFileProxy(TiFileFactory.createTitaniumFile(new String[] { uri.getPath() }, false));
+	} 
+	@Kroll.method
+	public int removeDownloadsByIds(Object o) {
+		long[] ids = importLongList(o);
+		if (ids != null)
+			return dMgr.remove(ids);
 		return 0;
-
 	}
 
 	private Long _startDownload(KrollDict dict) {
@@ -399,7 +426,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 			dMgr = (DownloadManager) appContext.getSystemService(Context.DOWNLOAD_SERVICE);
 		}
 	}
-	
+
 	private long[] importLongList(Object arg) {
 		int ndx = 0;
 		long[] longlist = null;
@@ -407,8 +434,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		if (arg instanceof Long) {
 			longlist = new long[1];
 			longlist[0] = (Long) arg;
-		}
-		else if (arg instanceof Object[]) {
+		} else if (arg instanceof Object[]) {
 			longlist = new long[Array.getLength(arg)];
 			for (Object e : (Object[]) arg) {
 				if (e instanceof Long) {
@@ -419,5 +445,14 @@ public class TiDownloadmanagerModule extends KrollModule {
 		}
 		return longlist;
 	}
-
+	
 }
+
+	
+	
+}
+	
+	
+	
+	
+
