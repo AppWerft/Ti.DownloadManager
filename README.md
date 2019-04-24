@@ -114,6 +114,20 @@ dmg.enqueue(request
 ```
 ## Methods of module
 
+### getStorageStatistics() 
+
+Return an object with:
+
+##### externalTotal
+
+Total size of external storage
+##### bytesconsumed
+Consumed bytes by this downloadmanager
+##### externalFree
+Free space on external storage
+
+Pay attention this [comment](https://stackoverflow.com/questions/3163045/how-to-check-availability-of-space-on-external-storage)
+
 ### createRequest(Url) : Request
 This method creates an empty request.
 
