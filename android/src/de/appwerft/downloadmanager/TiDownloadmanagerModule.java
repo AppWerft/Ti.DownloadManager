@@ -339,13 +339,14 @@ public class TiDownloadmanagerModule extends KrollModule {
 			}
 			int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
 			int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+			dl.put("bytesdownloaded",bytes_downloaded);
+			dl.put("bytestotal",bytes_total);
 			dl.put("status", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
-			dl.put("statw", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+			dl.put("state", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
 			dl.put("filename", filename);
 			dl.put("id", c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
 			dl.put("file", fileproxy);
 			dl.put("url", c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI)));
-			dl.put("url", c.getString(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)));
 			
 
 			dl.put("size_total", bytes_total);
