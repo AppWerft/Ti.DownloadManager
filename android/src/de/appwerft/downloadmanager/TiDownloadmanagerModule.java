@@ -407,7 +407,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 			HashMap<String, Object> dl = (HashMap<String, Object>)item;
 			Object o = dl.get("url");
 		
-			int id = (int)dl.get("id");
+			long id = (long)dl.get("id");
 			if (url.equals((String)o)) {
 				count++;
 				Log.d(LCAT,"item removed");
