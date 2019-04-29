@@ -397,6 +397,22 @@ public class TiDownloadmanagerModule extends KrollModule {
 		return dMgr.remove(id);
 	}
 
+	
+	
+	@Kroll.method
+	public int removeDownloadByUrl(String url) {
+		int count=0;
+		for (Object item : _getDownloads(STATUS_ALL)) {
+			HashMap<String, Object> dl = (HashMap<String, Object>)item;
+			Object o = dl.get("url");
+			int id = (int)dl.get("id");
+			if (url.equals((String)o)) {
+				count++;
+				dMgr.remove(id);
+			}
+		}
+		return count;
+	}
 	@Kroll.method
 	public TiFileProxy getTiFileForDownloadedFile(Long id) {
 		Uri uri = dMgr.getUriForDownloadedFile(id);
