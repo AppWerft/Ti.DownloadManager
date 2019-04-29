@@ -402,12 +402,15 @@ public class TiDownloadmanagerModule extends KrollModule {
 	@Kroll.method
 	public int removeDownloadByUrl(String url) {
 		int count=0;
+		Log.d(LCAT,"to remove item: "+ url);
 		for (Object item : _getDownloads(STATUS_ALL)) {
 			HashMap<String, Object> dl = (HashMap<String, Object>)item;
 			Object o = dl.get("url");
+		
 			int id = (int)dl.get("id");
 			if (url.equals((String)o)) {
 				count++;
+				Log.d(LCAT,"item removed");
 				dMgr.remove(id);
 			}
 		}
