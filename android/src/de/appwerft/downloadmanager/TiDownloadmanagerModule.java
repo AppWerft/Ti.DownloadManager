@@ -131,8 +131,6 @@ public class TiDownloadmanagerModule extends KrollModule {
 
 	public static DownloadManager dMgr;
 	private KrollFunction callback;
-	private String eventName = "DownloadReady";
-	private int notificationvisibility = 0;
 
 	private int allowedNetworkTypes = ConnectivityManager.TYPE_MOBILE | ConnectivityManager.TYPE_WIFI
 			| ConnectivityManager.TYPE_VPN;
@@ -148,29 +146,6 @@ public class TiDownloadmanagerModule extends KrollModule {
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
 		tiapp = app;
-	}
-
-	@Kroll.method
-	public Long startDownload(KrollDict dict) {
-		if (dict.containsKeyAndNotNull("success")) {
-			Object o = dict.get("success");
-			if (o instanceof KrollFunction) {
-				callback = (KrollFunction) dict.get("success");
-				Log.d(LCAT, "success callback successfull registered");
-			} else
-				Log.w(LCAT, "success isn't a callback");
-		} else
-			Log.w(LCAT, "missing success property");
-		if (dict.containsKeyAndNotNull(TiC.PROPERTY_URL)) {
-			try {
-				new URI(dict.getString(TiC.PROPERTY_URL));
-				return _startDownload(dict);
-			} catch (URISyntaxException e) {
-				Log.e(LCAT, "url is not valid");
-				return new Long(0);
-			}
-		}
-		return new Long(0);
 	}
 
 	@Kroll.method
@@ -229,7 +204,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 	}
 
 	@Kroll.method
-	public KrollDict getStatusOfDownload(String url) {
+	public KrollDict getStatusOfDownload(Long id) {
 		KrollDict res = new KrollDict();
 
 		DownloadManager.Query query = new DownloadManager.Query();
@@ -240,7 +215,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		Cursor c = dMgr.query(query);
 		c.moveToFirst();
 		while (c.moveToNext()) {
-			if (url.equals(c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI)))) {
+			if (id.equals(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)))) {
 				res.put("status", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
 			}
 		}
@@ -249,6 +224,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		c.close();
 		return res;
 	}
+
 	// https://stackoverflow.com/questions/3163045/how-to-check-availability-of-space-on-external-storage
 	@Kroll.method
 	public KrollDict getStorageStatistics() {
@@ -260,9 +236,9 @@ public class TiDownloadmanagerModule extends KrollModule {
 				/ (KILOBYTE * KILOBYTE);
 		externalFree = (externalStatFs.getAvailableBlocksLong() * externalStatFs.getBlockSizeLong())
 				/ (KILOBYTE * KILOBYTE);
-	res.put("externalTotal",externalTotal);
-	res.put("externalFree",externalFree);
-	return res;
+		res.put("externalTotal", externalTotal);
+		res.put("externalFree", externalFree);
+		return res;
 
 	}
 
@@ -325,40 +301,60 @@ public class TiDownloadmanagerModule extends KrollModule {
 		DownloadManager.Query query = new DownloadManager.Query();
 		getInstance();
 		Cursor c = dMgr.query(query);
-		c.moveToFirst();
-		while (c.moveToNext()) {
-			HashMap<String, Object> dl = new HashMap<String, Object>();
-			String filename = null;
-			TiFileProxy fileproxy = null;
-			String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-			if (downloadFileLocalUri != null) {
-				File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
-				filename = mFile.getAbsolutePath();
-				fileproxy = new TiFileProxy(
-						TiFileFactory.createTitaniumFile(new String[] { downloadFileLocalUri }, false));
-			}
-			int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-			int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-			dl.put("bytesdownloaded",bytes_downloaded);
-			dl.put("bytestotal",bytes_total);
-			dl.put("state", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
-			dl.put("filename", filename);
-			dl.put("id", c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
-			dl.put("url", c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI)));
-			dl.put("file", fileproxy);
-			
+		if (c.moveToFirst()) {
+			do {
+				HashMap<String, Object> dl = new HashMap<String, Object>();
+				String filename = null;
+				TiFileProxy fileproxy = null;
+				String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+				if (downloadFileLocalUri != null) {
+					File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
+					filename = mFile.getAbsolutePath();
+					fileproxy = new TiFileProxy(
+							TiFileFactory.createTitaniumFile(new String[] { downloadFileLocalUri }, false));
+				}
+				int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+				int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+				dl.put("bytesdownloaded", bytes_downloaded);
+				dl.put("bytestotal", bytes_total);
+				dl.put("state", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+				dl.put("filename", filename);
+				dl.put("id", c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
+				dl.put("url", c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI)));
+				dl.put("file", fileproxy);
 
-			dl.put("size_total", bytes_total);
-			dl.put("size_downloaded", bytes_downloaded);
-			dl.put("reason", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
-			dl.put("title", c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE)));
-			dl.put("mediatype", c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)));
-			if (status == STATUS_ALL) {
+				dl.put("size_total", bytes_total);
+				dl.put("size_downloaded", bytes_downloaded);
+				dl.put("reason", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
+				dl.put("title", c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE)));
+				dl.put("mediatype", c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)));
+				if (status == STATUS_ALL) {
+					downList.add(dl);
+				}
+				if (status == c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
+					downList.add(dl);
+				}
+			} while (c.moveToNext());
+		}
+		c.close();
+		return downList.toArray();
+	}
+
+	@Kroll.method
+	public Object[] getAllDownloadStates() {
+		@SuppressWarnings("rawtypes")
+		ArrayList<HashMap> downList = new ArrayList<HashMap>();
+		DownloadManager.Query query = new DownloadManager.Query();
+		getInstance();
+		Cursor c = dMgr.query(query);
+		if (c.moveToFirst()) {
+			do {
+				HashMap<String, Object> dl = new HashMap<String, Object>();
+				dl.put("state", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+				dl.put("id", c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
+				Log.d(LCAT, dl.toString());
 				downList.add(dl);
-			}
-			if (status == c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
-				downList.add(dl);
-			}
+			} while (c.moveToNext());
 
 		}
 		c.close();
@@ -397,25 +393,6 @@ public class TiDownloadmanagerModule extends KrollModule {
 		return dMgr.remove(id);
 	}
 
-	
-	
-	@Kroll.method
-	public int removeDownloadByUrl(String url) {
-		int count=0;
-		Log.d(LCAT,"to remove item: "+ url);
-		for (Object item : _getDownloads(STATUS_ALL)) {
-			HashMap<String, Object> dl = (HashMap<String, Object>)item;
-			Object o = dl.get("url");
-		
-			long id = (long)dl.get("id");
-			if (url.equals((String)o)) {
-				count++;
-				Log.d(LCAT,"item removed");
-				dMgr.remove(id);
-			}
-		}
-		return count;
-	}
 	@Kroll.method
 	public TiFileProxy getTiFileForDownloadedFile(Long id) {
 		Uri uri = dMgr.getUriForDownloadedFile(id);
@@ -467,7 +444,7 @@ public class TiDownloadmanagerModule extends KrollModule {
 		} else
 			Log.w(LCAT, "module has not callback prop '" + prop + "'");
 		String name = "downloadmanager:" + prop;
-		Log.d(LCAT,"fireAppEvent "+ name);
+		Log.d(LCAT, "fireAppEvent " + name);
 		tiapp.fireAppEvent(name, event);
 	}
 
@@ -503,14 +480,15 @@ public class TiDownloadmanagerModule extends KrollModule {
 		DownloadManager.Query query = new DownloadManager.Query();
 		getInstance();
 		Cursor c = dMgr.query(query);
-		c.moveToFirst();
-		while (c.moveToNext()) {
-			bytes += c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-			count++;
+		if (c.moveToFirst()) {
+			do {
+				bytes += c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+				count++;
+			} while (c.moveToNext());
 		}
 		c.close();
 		KrollDict res = new KrollDict();
-		res.put("bytesconsumed", bytes/ (KILOBYTE * KILOBYTE));
+		res.put("bytesconsumed", bytes / (KILOBYTE * KILOBYTE));
 		res.put("files", count);
 		return res;
 	}
