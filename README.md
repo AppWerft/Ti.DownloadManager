@@ -18,7 +18,7 @@ const localfile = Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, 
 dmg.createRequest(URL);
  
 request
-	.setAllowedNetworks(Ti.Network.NETWORK_WIFI)
+	.setAllowedNetworkTypes(Ti.Network.NETWORK_WIFI)
 	.setTitle("netter Titel")
 	.setdescription("nette Beschreibung")
 	.setDestinationUri(localfile);

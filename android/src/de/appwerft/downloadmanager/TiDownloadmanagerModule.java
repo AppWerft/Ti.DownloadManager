@@ -127,17 +127,18 @@ public class TiDownloadmanagerModule extends KrollModule {
 
 	private TiApplication appContext = TiApplication.getInstance();
 	private static TiApplication tiapp;
-	private Activity activity = appContext.getCurrentActivity();
+	private Activity activity = appContext.getAppRootOrCurrentActivity();
 
 	public static DownloadManager dMgr;
 	private KrollFunction callback;
+	private ServiceReceiver service ;
 
 	private int allowedNetworkTypes = ConnectivityManager.TYPE_MOBILE | ConnectivityManager.TYPE_WIFI
 			| ConnectivityManager.TYPE_VPN;
 
 	public TiDownloadmanagerModule() {
 		super();
-		ServiceReceiver service = new ServiceReceiver(this);
+		service = new ServiceReceiver(this);
 		activity.registerReceiver(service, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 		activity.registerReceiver(service, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
 		dMgr = (DownloadManager) appContext.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -147,6 +148,19 @@ public class TiDownloadmanagerModule extends KrollModule {
 	public static void onAppCreate(TiApplication app) {
 		tiapp = app;
 	}
+	@Override
+	public void onDestroy(Activity activity) 
+	{
+		if (service != null )
+		; // no need
+		// https://stackoverflow.com/questions/49589629/is-it-a-good-idea-to-unregister-download-receiver
+			
+			// This method is called when the root context is being destroyed
+		
+		
+		
+		super.onDestroy(activity);
+}
 
 	@Kroll.method
 	public void setAllowedNetworkTypes(int allowedNetworkTypes) {

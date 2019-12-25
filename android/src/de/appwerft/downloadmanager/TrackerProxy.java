@@ -8,14 +8,21 @@
  */
 package de.appwerft.downloadmanager;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import android.database.Cursor;
+import android.net.Uri;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.TiFileProxy;
+import org.appcelerator.titanium.io.TiFileFactory;
 
 import android.app.DownloadManager;
 import android.database.Cursor;
@@ -61,14 +68,8 @@ public class TrackerProxy extends KrollProxy {
         Long period = interval;  // repeat every 60 sec.
         observeDownloadManager = new TimerTask() {
           public void run() {
-        		DownloadManager.Query query = new DownloadManager.Query();
-        		Cursor c = downloader.query(query);
-      		c.moveToFirst();
-      		while (c.moveToNext()) {
-      			
-      		}
-      		c.close();
-                       
+        	  KrollDict res = new KrollDict();
+        	  res.put("data", getDownloads());
 
           }
         };
@@ -79,6 +80,28 @@ public class TrackerProxy extends KrollProxy {
     public void stopProgressTracker() {
 		
 		
+	}
+	private Object[] getDownloads() {
+		@SuppressWarnings("rawtypes")
+		ArrayList<HashMap> downList = new ArrayList<HashMap>();
+		DownloadManager.Query query = new DownloadManager.Query();
+		Cursor c = downloader.query(query);
+		if (c.moveToFirst()) {
+			do {
+				HashMap<String, Object> dl = new HashMap<String, Object>();
+				int bytes_downloaded = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+				int bytes_total = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+				dl.put("bytesdownloaded", bytes_downloaded);
+				dl.put("bytestotal", bytes_total);
+				dl.put("state", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+				dl.put("id", c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
+				dl.put("reason", c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
+				downList.add(dl);
+				
+			} while (c.moveToNext());
+		}
+		c.close();
+		return downList.toArray();
 	}
 	
 	
